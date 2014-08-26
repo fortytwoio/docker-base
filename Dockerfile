@@ -25,4 +25,4 @@ RUN echo "Etc/UTC" > /etc/timezone && \
 RUN DEBIAN_FRONTEND=noninteractive apt-get autoclean -qqy > /dev/null 2>&1 && \
     DEBIAN_FRONTEND=noninteractive apt-get autoremove -qqy > /dev/null 2>&1
 
-CMD echo -e "Hi! :)\nSee https://github.com/fortytwoio/docker-base-image for more information and source"
+CMD ["echo","-e","Hi! :)\nSee https://github.com/fortytwoio/docker-base-image for more information and source of the Dockerfile."]
