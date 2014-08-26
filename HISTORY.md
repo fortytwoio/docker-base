@@ -1,4 +1,10 @@
 
+1.0.3 / 2014-08-26
+==================
+
+ * Version bump in Dockerfile
+ * Fixed echo CMD statement
+
 1.0.2 / 2014-08-26
 ==================
 
