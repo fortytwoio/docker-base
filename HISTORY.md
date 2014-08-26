@@ -1,4 +1,9 @@
 
+1.0.2 / 2014-08-26
+==================
+
+ * Updated packages, removed some packages, added some packages. All in all it is 200MB less ;)
+
 1.0.1 / 2014-08-23
 ==================
 
