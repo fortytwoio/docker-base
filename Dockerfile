@@ -1,35 +1,28 @@
+## Version 1.0.2
 FROM debian:jessie
 MAINTAINER Thomas Fritz <thomas.fritz@forty-two.io>
 
-# First, update all packages in our base-image. You should no do that for your actual running containers.
-RUN apt-get update -qq && apt-get upgrade -qqy
+# First, update and upgrade all packages in our base-image. You should no do that for your actual running containers.
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qqy > /dev/null 2>&1 && \
+    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qqy > /dev/null 2>&1
 
-# Allow usage of apt-utils in later installs, so we use a seperate step
-RUN apt-get install -qqy --no-install-recommends apt-utils
-
-# Common used and rarely changing package dependencies
-RUN apt-get install -qqy --no-install-recommends \
-	software-properties-common \
-  build-essential \
-  make \
-  gcc \
-  locales
-
-RUN dpkg-reconfigure -f noninteractive locales && \
-  locale-gen C.UTF-8 && \
-  /usr/sbin/update-locale LANG=C.UTF-8
-
+# Generic UTF-8 locale
 ENV LC_ALL C.UTF-8
 
-# Install some more commonly used packages we might want to use
-RUN apt-get install -qqy --no-install-recommends \
-	git \
-	gettext-base \
-	htop \
-	wget \
-	curl \
-	vim
+# Common used and rarely changing package dependencies. locales package will also dpkg-reconfigure locales.
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -qqy --no-install-recommends \
+    make \
+    locales \
+    procps \
+    gettext-base \
+    curl \
+    vim-tiny \
+    > /dev/null 2>&1
 
 RUN echo "Etc/UTC" > /etc/timezone && \
-	dpkg-reconfigure -f noninteractive tzdata
+	DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
 
+RUN DEBIAN_FRONTEND=noninteractive apt-get autoclean -qqy > /dev/null 2>&1 && \
+    DEBIAN_FRONTEND=noninteractive apt-get autoremove -qqy > /dev/null 2>&1
+
+CMD echo -e "Hi! :)\nSee https://github.com/fortytwoio/docker-base-image for more information and source"
