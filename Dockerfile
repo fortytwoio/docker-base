@@ -1,4 +1,4 @@
-## Version 1.0.2
+## Version 1.0.3
 FROM debian:jessie
 MAINTAINER Thomas Fritz <thomas.fritz@forty-two.io>
 
