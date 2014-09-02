@@ -1,28 +1,38 @@
-## Version 1.0.3
-FROM debian:jessie
+## Version 1.0.5
+FROM fortytwoio/debian:latest
 MAINTAINER Thomas Fritz <thomas.fritz@forty-two.io>
 
-# First, update and upgrade all packages in our base-image. You should no do that for your actual running containers.
-RUN DEBIAN_FRONTEND=noninteractive apt-get update -qqy > /dev/null 2>&1 && \
-    DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade -qqy > /dev/null 2>&1
-
-# Generic UTF-8 locale
-ENV LC_ALL C.UTF-8
+RUN DEBIAN_FRONTEND=noninteractive apt-get update -qqy > /dev/null 2>&1
+# You do not have to do this in your Dockerfiles anymore :). Just convenience
+ONBUILD RUN DEBIAN_FRONTEND=noninteractive apt-get update -qqy > /dev/null 2>&1
 
 # Common used and rarely changing package dependencies. locales package will also dpkg-reconfigure locales.
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -qqy --no-install-recommends \
-    make \
-    locales \
-    procps \
-    gettext-base \
-    curl \
-    vim-tiny \
+    socat \
+    supervisor \
+    unzip \
     > /dev/null 2>&1
 
-RUN echo "Etc/UTC" > /etc/timezone && \
-	DEBIAN_FRONTEND=noninteractive dpkg-reconfigure -f noninteractive tzdata > /dev/null 2>&1
+# We want to add the local ./bin dir to /usr/local/bin in Docker container / images extending from this image.
+ONBUILD ADD ./bin/ /usr/local/bin/
+ONBUILD ADD ./etc/supervisor-conf.d/ /etc/supervisor/conf.d/
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get autoclean -qqy > /dev/null 2>&1 && \
-    DEBIAN_FRONTEND=noninteractive apt-get autoremove -qqy > /dev/null 2>&1
+# Ports used by Serf for node discovery and cluster managment
+EXPOSE 7373 7946
 
-CMD ["echo","-e","Hi! :)\nSee https://github.com/fortytwoio/docker-base-image for more information and source of the Dockerfile."]
+VOLUME ["/var/log"]
+
+CMD ["/usr/bin/env", "init.sh"]
+
+# Downloading, unpacking and moving in $PATH of serf binary
+ADD https://dl.bintray.com/mitchellh/serf/0.6.3_linux_amd64.zip /tmp/serf.zip
+RUN cd /tmp && \
+    unzip /tmp/serf.zip && \
+    mv /tmp/serf /usr/local/bin
+
+# We add the local ./bin dir to /usr/local/bin.
+ADD ./bin/ /usr/local/bin/
+ADD ./etc/supervisor-conf.d/ /etc/supervisor/conf.d/
+
+RUN rm -rf /tmp/* && \
+    rm -rf /var/tmp/*
