@@ -1,4 +1,4 @@
-## Version 1.0.5
+## Version 1.0.4
 FROM fortytwoio/debian:latest
 MAINTAINER Thomas Fritz <thomas.fritz@forty-two.io>
 
